@@ -75,9 +75,21 @@ def merge_on_subject_admission(table1, table2):
     return table1.merge(table2, how='inner', left_on=['SUBJECT_ID', 'HADM_ID'], right_on=['SUBJECT_ID', 'HADM_ID'])
 
 
+# def add_age_to_icustays(stays):
+#     stays['AGE'] = (stays.INTIME - stays.DOB).apply(lambda s: s / np.timedelta64(1, 's')) / 60./60/24/365
+#     stays.loc[stays.AGE < 0, 'AGE'] = 90
+#     return stays
+
 def add_age_to_icustays(stays):
-    stays['AGE'] = (stays.INTIME - stays.DOB).apply(lambda s: s / np.timedelta64(1, 's')) / 60./60/24/365
-    stays.loc[stays.AGE < 0, 'AGE'] = 90
+    dob = pd.to_datetime(stays["DOB"])
+    dob = dob.values.astype("datetime64[s]")
+    intime = pd.to_datetime(stays["INTIME"])
+    intime = intime.values.astype("datetime64[s]")
+    age = intime - dob
+    g = lambda x: x / np.timedelta64(1, "s") / 60 / 60 / 24 / 365
+    stays["AGE"] = np.asarray(list(map(g, age)))
+    idxs = stays.AGE < 0
+    stays.loc[idxs, "AGE"] = 90
     return stays
 
 

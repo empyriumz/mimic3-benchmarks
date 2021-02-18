@@ -1,8 +1,9 @@
 # custom
 .idea
+.vscode
 miscellaneous
 notebook
-
+data
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
